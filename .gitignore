@@ -11,6 +11,8 @@ node_modules
 dist
 dist-ssr
 *.local
+google-search-app
+google-search-app.zip
 
 # Editor directories and files
 .vscode/*

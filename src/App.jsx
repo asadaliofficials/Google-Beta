@@ -1,7 +1,18 @@
-import React from 'react';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
 
-const App = () => {
-	return <div className='text-green-500 text-8xl font-black font-sans uppercase'>App</div>;
-};
+import Home from './components/Home';
+import SearchResult from './components/SearchResult';
+import { AppContext } from './utils/ContextApi';
+
+function App() {
+	return (
+		<BrowserRouter>
+			<Routes>
+				<Route path="/" element={<Home />} />
+				<Route path="/search" element={<SearchResult />} />
+			</Routes>
+		</BrowserRouter>
+	);
+}
 
 export default App;
