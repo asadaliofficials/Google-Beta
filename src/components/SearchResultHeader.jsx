@@ -6,7 +6,7 @@ import { BiNews } from 'react-icons/bi';
 import { RiVideoLine } from 'react-icons/ri';
 import { SlTag } from 'react-icons/sl';
 
-import Logo from '../assets/google-logo.png';
+import Logo from '../assets/beta.png';
 import SearchInput from './SearchInput';
 import ProfileIcon from './ProfileIcon';
 import { Context } from '../utils/ContextApi';
@@ -33,7 +33,7 @@ const SearchResultHeader = () => {
 					<Link to="/">
 						<img className="hidden md:block w-[92px] mr-10" src={Logo} alt="Logo" />
 					</Link>
-					<SearchInput from="searchResult" />
+					<SearchInput searchResult={true} />
 				</div>
 				<div className="hidden md:block">
 					<ProfileIcon />

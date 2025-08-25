@@ -1,12 +1,17 @@
 import { useState, useEffect } from 'react';
 import { FiChevronRight, FiChevronLeft } from 'react-icons/fi';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 
 import Logo from '../assets/google-pagination-logo.png';
 import { pagination } from '../utils/Constants';
 
 const Pagination = ({ queries }) => {
-	const { query } = useParams();
+		const location = useLocation();
+	const queryParams = new URLSearchParams(location.search);
+
+	const query = queryParams.get('q') || '';
+
+
 	const [page, setPage] = useState(pagination[0].startIndex);
 	const navigate = useNavigate();
 
@@ -16,7 +21,8 @@ const Pagination = ({ queries }) => {
 
 	const paginationClickHandler = startIndex => {
 		setPage(startIndex);
-		navigate(`/${query}/${startIndex}`);
+		// navigate(`/${query}/${startIndex}`);
+		navigate(`/search?q=${query}&start=${startIndex}`);
 	};
 
 	return (

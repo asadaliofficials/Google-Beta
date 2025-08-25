@@ -6,7 +6,7 @@ const Footer = () => {
 	return (
 		<footer className="bg-[#f2f2f2]">
 			<div className="flex py-[15px] px-[15px] md:px-[30px] border-b border-[#dadce0]">
-				<span className="text-[#70757a] text-[15px] leading-none tracking-wide">PAKISTAN - ASAD ALI</span>
+				<span className="text-[#70757a] text-[15px] font-bold leading-none tracking-wide">PAKISTAN - ASAD ALI</span>
 			</div>
 
 			<div className="flex flex-col md:flex-row justify-between py-3 md:py-0 md:px-[15px] border-b border-[#dadce0]">
@@ -14,7 +14,7 @@ const Footer = () => {
 					{quickLinks.map((menu, index) => (
 						<span
 							key={index}
-							className="text-[#70757a] text-[12px] md:text-[14px] leading-none p-[10px] md:p-[15px]"
+							className="text-[#70757a] text-[12px] md:text-[14px] leading-none p-[10px] md:p-[15px] font-semibold"
 						>
 							{menu}
 						</span>
@@ -25,7 +25,7 @@ const Footer = () => {
 					{settingMenu.map((menu, index) => (
 						<span
 							key={index}
-							className="text-[#70757a] text-[12px] md:text-[14px] leading-none p-[10px] md:p-[15px]"
+							className="text-[#70757a] text-[12px] md:text-[14px] leading-none p-[10px] md:p-[15px] font-semibold"
 						>
 							{menu}
 						</span>

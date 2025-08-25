@@ -6,3 +6,6 @@
 	--shadow-c2: 0 1px 1px rgb(0 0 0 / 10%);
 	--shadow-test: 0 10px 30px rgba(0, 255, 0, 0.6); /* BIG GREEN SHADOW */
 }
+body{
+	scroll-behavior: smooth;
+}
