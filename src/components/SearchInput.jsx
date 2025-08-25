@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState, useRef } from 'react';
 import { AiOutlineSearch } from 'react-icons/ai';
 import { IoMdClose } from 'react-icons/io';
 import { useNavigate, useLocation } from 'react-router-dom';
@@ -10,10 +10,7 @@ import { Context } from '../utils/ContextApi';
 const SearchInput = ({ searchResult }) => {
 	const location = useLocation();
 	const queryParams = new URLSearchParams(location.search);
-
 	const query = queryParams.get('q') || '';
-
-	// const { query } = useParams();
 
 	const { searchQuery, setSearchQuery } = useContext(Context);
 	useEffect(() => {
@@ -29,11 +26,54 @@ const SearchInput = ({ searchResult }) => {
 	};
 
 	const [listening, setListening] = useState(false);
+	const recognitionRef = useRef(null);
 
-	function handleMikeClick() {
-		setSearchQuery('');
-		setListening(true);
-	}
+	const startListening = () => {
+		// Check browser support
+		const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+		if (!SpeechRecognition) {
+			alert('Speech Recognition not supported in this browser.');
+			return;
+		}
+
+		recognitionRef.current = new SpeechRecognition();
+		recognitionRef.current.lang = 'en-US';
+		recognitionRef.current.interimResults = true;
+		recognitionRef.current.continuous = true;
+
+		recognitionRef.current.onstart = () => {
+			setListening(true);
+			setSearchQuery('');
+		};
+
+		recognitionRef.current.onend = () => {
+			setListening(false);
+		};
+		let silenceTimer;
+
+		recognitionRef.current.onresult = event => {
+			let transcript = '';
+			for (let i = event.resultIndex; i < event.results.length; i++) {
+				transcript += event.results[i][0].transcript;
+			}
+			setSearchQuery(transcript);
+
+			clearTimeout(silenceTimer);
+			silenceTimer = setTimeout(() => {
+				stopListening();
+			}, 1000); // 2 seconds of silence → stop
+		};
+
+		recognitionRef.current.start();
+	};
+
+	const stopListening = () => {
+		if (recognitionRef.current) {
+			recognitionRef.current.stop();
+		}
+		setListening(false);
+	};
+
 	return (
 		<div
 			id="searchBox"
@@ -41,27 +81,46 @@ const SearchInput = ({ searchResult }) => {
 		>
 			<AiOutlineSearch size={18} color="#9aa0a6" />
 			<input
-				placeholder={listening ? 'speak now...' : 'Search...'}
+				placeholder={listening ? '🎤 Speak now...' : 'Search...'}
 				type="text"
 				onChange={e => setSearchQuery(e.target.value)}
 				onKeyUp={searchQueryHandler}
 				value={searchQuery}
 				autoFocus={!searchResult}
 				className={`grow outline-0 text-black/[0.87] ${listening ? 'caret-transparent' : ''}`}
+				readOnly={listening} // disable typing while listening
 			/>
 			<div className="flex items-center gap-3">
-				{searchQuery && (
+				{(searchQuery || listening) && (
 					<IoMdClose
 						size={24}
 						color="#70757a"
 						className="cursor-pointer"
 						onClick={() => {
-							setSearchQuery(''), setListening(false);
+							stopListening();
+							setSearchQuery('');
 						}}
 					/>
 				)}
-				<img onClick={handleMikeClick} className="h-6 w-6 cursor-pointer" src={MicIcon} alt="" />
-				<img className="h-6 w-6 cursor-pointer" src={ImageIcon} alt="" />
+
+				{/* Mic button */}
+				{!listening ? (
+					<img
+						onClick={startListening}
+						className="h-6 w-6 cursor-pointer"
+						src={MicIcon}
+						alt="mic"
+					/>
+				) : (
+					<img
+						onClick={stopListening}
+						className="h-6 w-6 cursor-pointer"
+						src={MicIcon}
+						alt="stop mic"
+					/>
+				)}
+
+				<img className="h-6 w-6 cursor-pointer" src={ImageIcon} alt="image" />
 			</div>
 		</div>
 	);
