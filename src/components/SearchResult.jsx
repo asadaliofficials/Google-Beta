@@ -31,8 +31,8 @@ const SearchResult = () => {
 				payload.searchType = 'image';
 			}
 			try {
-				// const res = await fetchDataFromApi(payload);
-				// setResult(res);
+				const res = await fetchDataFromApi(payload);
+				setResult(res);
 			} catch (error) {
 				console.error('Failed to fetch search results', error);
 			}

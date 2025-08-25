@@ -27,9 +27,9 @@ const SearchInput = ({ searchResult }) => {
 
 	const [listening, setListening] = useState(false);
 	const recognitionRef = useRef(null);
+	const silenceTimerRef = useRef(null);
 
 	const startListening = () => {
-		// Check browser support
 		const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
 		if (!SpeechRecognition) {
 			alert('Speech Recognition not supported in this browser.');
@@ -46,22 +46,32 @@ const SearchInput = ({ searchResult }) => {
 			setSearchQuery('');
 		};
 
-		recognitionRef.current.onend = () => {
-			setListening(false);
-		};
-		let silenceTimer;
-
 		recognitionRef.current.onresult = event => {
 			let transcript = '';
 			for (let i = event.resultIndex; i < event.results.length; i++) {
 				transcript += event.results[i][0].transcript;
+				if (event.results[i].isFinal) {
+					// Final text → navigate immediately
+					setSearchQuery(transcript);
+					navigate(`/search?q=${transcript}&start=${1}`);
+					stopListening();
+					return;
+				}
 			}
 			setSearchQuery(transcript);
 
-			clearTimeout(silenceTimer);
-			silenceTimer = setTimeout(() => {
+			// restart silence timer
+			clearTimeout(silenceTimerRef.current);
+			silenceTimerRef.current = setTimeout(() => {
 				stopListening();
-			}, 1000); // 2 seconds of silence → stop
+				if (transcript.trim().length > 0) {
+					navigate(`/search?q=${transcript}&start=${1}`);
+				}
+			}, 1000); // 1 sec pause
+		};
+
+		recognitionRef.current.onend = () => {
+			setListening(false);
 		};
 
 		recognitionRef.current.start();
@@ -72,6 +82,7 @@ const SearchInput = ({ searchResult }) => {
 			recognitionRef.current.stop();
 		}
 		setListening(false);
+		clearTimeout(silenceTimerRef.current);
 	};
 
 	return (
@@ -88,7 +99,7 @@ const SearchInput = ({ searchResult }) => {
 				value={searchQuery}
 				autoFocus={!searchResult}
 				className={`grow outline-0 text-black/[0.87] ${listening ? 'caret-transparent' : ''}`}
-				readOnly={listening} // disable typing while listening
+				readOnly={listening}
 			/>
 			<div className="flex items-center gap-3">
 				{(searchQuery || listening) && (
@@ -103,7 +114,6 @@ const SearchInput = ({ searchResult }) => {
 					/>
 				)}
 
-				{/* Mic button */}
 				{!listening ? (
 					<img
 						onClick={startListening}
